@@ -12,6 +12,11 @@ public class MainClassTest {
     public void testGetClassNumber(){
         Assert.assertTrue("Returned value should be bigger that 45, actual is " + MainClass.getClassNumber(),
                 MainClass.getClassNumber() > 45);
+    }
 
+    @Test
+    public void testGetClassString(){
+        Assert.assertTrue("String should contains Hello or hello substring, actual " + MainClass.getClassString(),
+                MainClass.getClassString().contains("hello") || MainClass.getClassString().contains("Hello"));
     }
 }
