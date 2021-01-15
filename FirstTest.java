@@ -7,10 +7,12 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
+import java.util.List;
 
 public class FirstTest {
 
@@ -148,11 +150,59 @@ public class FirstTest {
         );
     }
 
+    @Test
+    public void testCompareSearchResult()
+    {
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search wikipedia' input",
+                5
+        );
+
+        String inputData = "Java";
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                inputData,
+                "Cannot find search input",
+                5
+        );
+
+        Assert.assertTrue(
+                "No data found by input value " + inputData,
+                waitUntilElementsPresent(
+                        By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']"))
+        );
+
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/search_close_btn"),
+                "Cannot find X to cancel button",
+                15
+        );
+
+        Assert.assertTrue(
+                "Search results should be empty after pressing cancel button",
+                waitUntilNoElementsPresent(
+                        By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']"))
+        );
+    }
+
     private WebElement waitForElementPresent(By by, String error_msg, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_msg + "/n");
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
+    }
+
+    private boolean waitUntilElementsPresent(By by)
+    {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        return wait.until((ExpectedCondition<Boolean>) driver -> driver.findElements(by).size() > 0);
+    }
+
+    private boolean waitUntilNoElementsPresent(By by)
+    {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        return wait.until((ExpectedCondition<Boolean>) driver -> driver.findElements(by).size() == 0);
     }
 
     private WebElement waitForElementPresent(By by, String error_msg)
