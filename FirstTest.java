@@ -132,6 +132,22 @@ public class FirstTest {
         );
     }
 
+    @Test
+    public void testCompareSearchInputText()
+    {
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search wikipedia' input",
+                5
+        );
+
+        assertElementHasText(
+                By.id("org.wikipedia:id/search_src_text"),
+                "Search…",
+                "Search Input contains unexpected text"
+        );
+    }
+
     private WebElement waitForElementPresent(By by, String error_msg, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
@@ -141,6 +157,12 @@ public class FirstTest {
 
     private WebElement waitForElementPresent(By by, String error_msg)
     {
+        return waitForElementPresent(by, error_msg, 5);
+    }
+
+    private WebElement waitForElementPresent(By by)
+    {
+        String error_msg = "Web element with locator " + by + " is not found";
         return waitForElementPresent(by, error_msg, 5);
     }
 
@@ -169,5 +191,15 @@ public class FirstTest {
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
         element.clear();
         return element;
+    }
+
+    private void assertElementHasText(By by, String expected_text, String error_message)
+    {
+        WebElement element = waitForElementPresent(by);
+        String actual_text = element.getAttribute("text");
+        Assert.assertEquals(
+                error_message,
+                expected_text,
+                actual_text);
     }
 }
