@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.Console;
 import java.net.URL;
 import java.util.List;
 
@@ -186,11 +187,52 @@ public class FirstTest {
         );
     }
 
+    @Test
+    public void testCheckResultsContainSearchData()
+    {
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search wikipedia' input",
+                5
+        );
+
+        String searchText = "Java";
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                searchText,
+                "Cannot find search input",
+                5
+        );
+
+        Assert.assertTrue(
+                "No data found by input value " + searchText,
+                eachElementContainsText(
+                        By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']"),
+                        "Java")
+        );
+    }
+
     private WebElement waitForElementPresent(By by, String error_msg, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_msg + "/n");
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
+    }
+
+    private boolean eachElementContainsText(By by, String text)
+    {
+        var list = waitAndGetElements(by);
+        for (WebElement w: list) {
+            if ( w.findElement(By.xpath("//*[contains(@text, '" + text + "')]")) == null)
+                return false;
+        }
+        return true;
+    }
+
+    private List<WebElement> waitAndGetElements(By by)
+    {
+        waitUntilElementsPresent(by);
+        return driver.findElements(by);
     }
 
     private boolean waitUntilElementsPresent(By by)
