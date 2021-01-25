@@ -451,6 +451,40 @@ public class FirstTest {
         );
     }
 
+
+    @Test
+    public void testCheckArticleTitleExistence()
+    {
+        var article = "Turkish Angora";
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search wikipedia' input"
+        );
+
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                article,
+                "Cannot find search input",
+                10
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='" + article + "'][@resource-id='org.wikipedia:id/page_list_item_title']"),
+                "Cannot find 'Search wikipedia' input"
+        );
+
+        assertElementPresent(By.id("org.wikipedia:id/view_page_title_text"),
+                "Title for article " + article + "should not be null");
+    }
+
+    private void assertElementPresent(By by, String error_message)
+    {
+        Assert.assertNotNull(
+                error_message,
+                driver.findElement(by)
+        );
+    }
     private WebElement waitForElementPresent(By by, String error_msg, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
