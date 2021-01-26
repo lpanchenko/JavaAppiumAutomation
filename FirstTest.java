@@ -5,10 +5,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.ScreenOrientation;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,6 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class FirstTest {
 
@@ -451,6 +449,136 @@ public class FirstTest {
         );
     }
 
+    @Test
+    public void testRemoveArticleFromSavedList() throws Exception {
+
+        var firstArticle = "Persian cat";
+        var secondArticle = "Turkish Angora";
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search wikipedia' input"
+        );
+
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                firstArticle,
+                "Cannot find search input",
+                10
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='" + firstArticle + "'][@resource-id='org.wikipedia:id/page_list_item_title']"),
+                "Cannot find 'Search wikipedia' input"
+        );
+
+        WebElement toolBar = waitForElementPresent(
+                By.id("org.wikipedia:id/page_toolbar"),
+                "Cannot find toolbar by id"
+        );
+
+        // During receiving menu element with waitForElementPresent method
+        // Script clicks twice on 'More actions item' and opened the wrong element
+        // Use Find element method that works better in this case
+        var moreOptionsMenuItem = waitAndFindElement(
+                toolBar,
+                By.xpath("//android.widget.ImageView[@content-desc='More options']"),
+                "Cannot find More options menu item"
+                );
+        moreOptionsMenuItem.click();
+
+        var addToReadingListMenuItem = waitAndFindElement(
+                By.xpath("//*[@resource-id='org.wikipedia:id/title'][@text='Add to reading list']"),
+                "Can not find Add to reading list menu item");
+        addToReadingListMenuItem.click();
+
+        waitForElementAndClick(By.id("org.wikipedia:id/onboarding_button"),
+                "Cannot find 'Got it' tip overlay"
+        );
+
+        waitForElementAndClear(By.id("org.wikipedia:id/text_input"),
+                "Cannot find input to set name of articles folder",
+                5);
+
+        String name_of_folder = "Two article list";
+
+        waitForElementAndSendKeys(By.id("org.wikipedia:id/text_input"),
+                name_of_folder,
+                "Cannot put text into articles folder input",
+                5);
+
+        waitForElementAndClick(By.xpath("//*[@text='OK']"),
+                "Cannot press OK button"
+        );
+
+        waitForElementAndClick(By.xpath("//*[@content-desc=\"Search Wikipedia\"]"),
+                        "Can not found 'Search Wikipedia button'");
+
+        waitForElementAndSendKeys(
+                By.id("org.wikipedia:id/search_src_text"),
+                secondArticle,
+                "Cannot find search input",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='"+secondArticle+"'][@resource-id='org.wikipedia:id/page_list_item_title']"),
+                "Cannot find 'Search wikipedia' input",
+                10
+        );
+
+        toolBar = waitForElementPresent(
+                By.id("org.wikipedia:id/page_toolbar"),
+                "Cannot find toolbar by id"
+        );
+
+        moreOptionsMenuItem = waitAndFindElement(
+                toolBar,
+                By.xpath("//android.widget.ImageView[@content-desc='More options']"),
+                "Cannot find More options menu item"
+        );
+        moreOptionsMenuItem.click();
+
+        addToReadingListMenuItem = waitAndFindElement(
+                By.xpath("//*[@resource-id='org.wikipedia:id/title'][@text='Add to reading list']"),
+                "Can not find Add to reading list menu item");
+        addToReadingListMenuItem.click();
+
+        waitForElementAndClick(By.xpath("//*[@resource-id='org.wikipedia:id/item_title'][@text='"+name_of_folder+"']"),
+                "Canot found folder "+name_of_folder+" with saved articles");
+
+        waitForElementAndClick(By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
+                "Cannot close article, cannot find X link"
+        );
+
+        waitForElementAndClick(By.xpath("//android.widget.FrameLayout[@content-desc='My lists']"),
+                "Cannot found navigation button to My list"
+        );
+
+        var savedList = waitAndFindElement(By.xpath("//*[@text='" + name_of_folder + "']"),
+                "Cannot find saved list with name " + name_of_folder);
+        savedList.click();
+
+        swipeElementToLeft(
+                By.xpath("//*[@text='"+ firstArticle+"']"),
+                "Cannot find saved article"
+        );
+
+        waitForElementNotPresent(
+                By.xpath("//*[@text='"+firstArticle+"']"),
+                "Article with name " + firstArticle + " should be deleted",
+                5
+        );
+
+        waitForElementAndClick(By.xpath("//*[@text='"+secondArticle+"']"),
+                "Cannot find saved article with name " + secondArticle,
+                5
+        );
+
+        assertElementHasText(By.id("org.wikipedia:id/view_page_title_text"),
+                secondArticle,
+                "Article title should has name " + secondArticle);
+    }
 
     @Test
     public void testCheckArticleTitleExistence()
@@ -485,6 +613,24 @@ public class FirstTest {
                 driver.findElement(by)
         );
     }
+
+    // This method wait 10 seconds until appeared the first element by the specified locator
+    // After that finds element and returns it
+    private WebElement waitAndFindElement(By by, String error_msg) throws Exception {
+        if (!waitUntilElementsPresent(by))
+            throw new NoSuchElementException(error_msg);
+
+        return driver.findElement(by);
+    }
+
+    private WebElement waitAndFindElement(WebElement parent, By by, String error_msg)
+    {
+        if (!waitUntilElementsPresent(by))
+            throw new NoSuchElementException(error_msg);
+
+        return parent.findElement(by);
+    }
+
     private WebElement waitForElementPresent(By by, String error_msg, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
