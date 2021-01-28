@@ -39,4 +39,20 @@ public class ArticleTests extends CoreTestCase
         ArticlePageObject.waitForArticleTitle();
         ArticlePageObject.swipeToFooter();
     }
+
+    @Test
+    public void testCheckArticleTitleExistence()
+    {
+        var article = "Turkish Angora";
+
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
+        SearchPageObject.initSearchInput();
+        SearchPageObject.enterDataToSearchInput(article);
+
+        SearchPageObject.clickByArticleWithTitle(article);
+
+        ArticlePageObject ArticlePageObject = new ArticlePageObject(driver);
+        assertTrue("Article should not be null",
+                ArticlePageObject.waitForArticleTitle() != null);
+    }
 }

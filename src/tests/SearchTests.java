@@ -53,4 +53,45 @@ public class SearchTests extends CoreTestCase
         SearchPageObject.waitForEmptyResultsLabel();
         SearchPageObject.assertThereIsNoResultOfSearch();
     }
+
+    @Test
+    public void testCompareSearchInputText()
+    {
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
+        SearchPageObject.initSearchInput();
+        SearchPageObject.assertDefaultValueInSearchInput();
+    }
+
+    @Test
+    public void testCompareSearchResult() {
+        String inputData = "Java";
+
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
+        SearchPageObject.initSearchInput();
+        SearchPageObject.enterDataToSearchInput(inputData);
+
+        int amount_of_search_results = SearchPageObject.getAmountOfArticles();
+        assertTrue(
+                "No data found by input value " + inputData,
+                amount_of_search_results > 0
+        );
+
+        SearchPageObject.clickCancelButton();
+
+        SearchPageObject.waitForResultIsEmpty();
+    }
+
+    @Test
+    public void testCheckResultsContainSearchData() throws InterruptedException {
+        String inputData = "Java";
+
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
+        SearchPageObject.initSearchInput();
+        SearchPageObject.enterDataToSearchInput(inputData);
+
+        assertTrue(
+                "No data found by input value " + inputData,
+                SearchPageObject.eachElementContainsText(inputData)
+        );
+    }
 }
