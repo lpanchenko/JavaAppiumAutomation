@@ -24,7 +24,7 @@ public class MyListsPageObject extends MainPageObject {
         super(driver);
     }
 
-    public void openFolderByName(String name_of_folder)
+    public void openReadingListByName(String name_of_folder)
     {
         String folder_name_xpath = getFolderXpathByName(name_of_folder);
         this.waitForElementAndClick(
@@ -49,7 +49,6 @@ public class MyListsPageObject extends MainPageObject {
     {
         String article_xpath = getSavedArticleXpathByTitle(article_title);
         this.waitForElementNotPresent(By.xpath(article_xpath),
-                "Saved article still present with title " + article_title,
         15
         );
     }
@@ -60,6 +59,14 @@ public class MyListsPageObject extends MainPageObject {
         this.waitForElementPresent(By.xpath(article_xpath),
                 "Cannot find saved article by title " + article_title,
                 15
+        );
+    }
+
+    public void openArticle(String title)
+    {
+        String article_xpath = getSavedArticleXpathByTitle(title);
+        this.waitForElementAndClick(By.xpath(article_xpath),
+                "Cannot find saved article by title " + title
         );
     }
 }

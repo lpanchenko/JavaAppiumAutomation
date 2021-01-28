@@ -12,8 +12,8 @@ public class SearchTests extends CoreTestCase
         SearchPageObject SearchPageObject = new SearchPageObject(driver);
 
         SearchPageObject.initSearchInput();
-        SearchPageObject.typeSearchLine("Java");
-        SearchPageObject.waitForSearchResultContainsDescription("Object-oriented programming language");
+        SearchPageObject.enterDataToSearchInput("Java");
+        SearchPageObject.waitForArticleWithDescription("Object-oriented programming language");
     }
 
     @Test
@@ -23,19 +23,19 @@ public class SearchTests extends CoreTestCase
 
         SearchPageObject.initSearchInput();
         SearchPageObject.waitForCancelButtonToAppear();
-        SearchPageObject.clickCancelSearch();
+        SearchPageObject.clickCancelButton();
         SearchPageObject.waitForCancelButtonToDisappear();
     }
 
     @Test
     public void testAmountOfNotEmptySearch()
     {
-        String search_line = "Linkin Park Diskography";
+        String search_line = "Linkin Park Discography";
 
         SearchPageObject SearchPageObject = new SearchPageObject(driver);
         SearchPageObject.initSearchInput();
-        SearchPageObject.typeSearchLine(search_line);
-        int amount_of_search_results = SearchPageObject.getAmountOfFoundArticles();
+        SearchPageObject.enterDataToSearchInput(search_line);
+        int amount_of_search_results = SearchPageObject.getAmountOfArticles();
 
         assertTrue(
                 "We found a few results instead of one",
@@ -49,7 +49,7 @@ public class SearchTests extends CoreTestCase
         SearchPageObject SearchPageObject = new SearchPageObject(driver);
         SearchPageObject.initSearchInput();
         String search_line = "fsdfsdfsdfsd";
-        SearchPageObject.typeSearchLine(search_line);
+        SearchPageObject.enterDataToSearchInput(search_line);
         SearchPageObject.waitForEmptyResultsLabel();
         SearchPageObject.assertThereIsNoResultOfSearch();
     }

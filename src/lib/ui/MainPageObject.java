@@ -10,10 +10,10 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-
 public class MainPageObject {
+
+    private static final String
+        ELEMENT_CONTAINS_TEXT_TPL = "//*[contains(@text, '{TEXT}')]";
 
     protected AppiumDriver driver;
 
@@ -22,30 +22,12 @@ public class MainPageObject {
         this.driver = driver;
     }
 
-    public void assertElementPresent(By by, String error_message)
+    /* TEMPLATES METHODS */
+    protected static String getElementContainsTextXpath(String text)
     {
-        Assert.assertNotNull(
-                error_message,
-                driver.findElement(by)
-        );
+        return ELEMENT_CONTAINS_TEXT_TPL.replace("{TEXT}", text);
     }
-
-    // This method wait 10 seconds until appeared the first element by the specified locator
-    // After that finds element and returns it
-    public WebElement waitAndFindElement(By by, String error_msg) throws Exception {
-        if (!waitUntilElementsPresent(by))
-            throw new NoSuchElementException(error_msg);
-
-        return driver.findElement(by);
-    }
-
-    public WebElement waitAndFindElement(WebElement parent, By by, String error_msg)
-    {
-        if (!waitUntilElementsPresent(by))
-            throw new NoSuchElementException(error_msg);
-
-        return parent.findElement(by);
-    }
+    /* TEMPLATES METHODS */
 
     public WebElement waitForElementPresent(By by, String error_msg, long timeoutInSeconds)
     {
@@ -54,64 +36,25 @@ public class MainPageObject {
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
-    public boolean eachElementContainsText(By by, String text)
-    {
-        var list = waitAndGetElements(by);
-        for (WebElement w: list) {
-            if ( w.findElement(By.xpath("//*[contains(@text, '" + text + "')]")) == null)
-                return false;
-        }
-        return true;
-    }
-
-    public int getAmountOfElements(By by)
-    {
-        List elements = driver.findElements(by);
-        return elements.size();
-    }
-
-    public List<WebElement> waitAndGetElements(By by)
-    {
-        waitUntilElementsPresent(by);
-        return driver.findElements(by);
-    }
-
-    public boolean waitUntilElementsPresent(By by)
-    {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        return wait.until((ExpectedCondition<Boolean>) driver -> driver.findElements(by).size() > 0);
-    }
-
-    public boolean waitUntilNoElementsPresent(By by)
-    {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        return wait.until((ExpectedCondition<Boolean>) driver -> driver.findElements(by).size() == 0);
-    }
-
-    public void assetElementNotPresent(By by, String error_msg)
-    {
-        int amountOfElement = getAmountOfElements(by);
-        if (amountOfElement > 0)
-        {
-            String default_msg = "An element " + by.toString() + " supposed to be not present";
-            throw new AssertionError(default_msg + " " + error_msg);
-        }
-    }
-
-    public WebElement waitForElementPresent(By by, String error_msg)
-    {
-        return waitForElementPresent(by, error_msg, 5);
-    }
-
     public WebElement waitForElementPresent(By by)
     {
         String error_msg = "Web element with locator " + by + " is not found";
         return waitForElementPresent(by, error_msg, 5);
     }
 
-    public WebElement waitForElementAndClick(By by, String error_message)
+    public boolean waitForElementNotPresent(By by, long timeoutInSeconds)
     {
-        return waitForElementAndClick(by, error_message, 5);
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
+        return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+    }
+
+    public void assertElementNotPresent(By by, String error_msg)
+    {
+        if (!waitForElementNotPresent(by, 10))
+        {
+            String default_msg = "An element " + by.toString() + " supposed to be not present";
+            throw new AssertionError(default_msg + " " + error_msg);
+        }
     }
 
     public WebElement waitForElementAndClick(By by, String error_message, long timeoutInSeconds)
@@ -121,9 +64,9 @@ public class MainPageObject {
         return element;
     }
 
-    public WebElement waitForElementAndSendKeys(By by, String value, String error_message)
+    public WebElement waitForElementAndClick(By by, String error_message)
     {
-        return waitForElementAndSendKeys(by, value, error_message, 5);
+        return waitForElementAndClick(by, error_message, 10);
     }
 
     public WebElement waitForElementAndSendKeys(By by, String value, String error_message, long timeoutInSeconds)
@@ -133,12 +76,6 @@ public class MainPageObject {
         return element;
     }
 
-    public boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds)
-    {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-        return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
-    }
-
     public WebElement waitForElementAndClear(By by, String error_message, long timeoutInSeconds)
     {
         WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
@@ -146,7 +83,7 @@ public class MainPageObject {
         return element;
     }
 
-    public void assertElementHasText(By by, String expected_text, String error_message)
+    public void assertElementText(By by, String expected_text, String error_message)
     {
         WebElement element = waitForElementPresent(by);
         String actual_text = element.getAttribute("text");
@@ -208,11 +145,5 @@ public class MainPageObject {
                 .moveTo(left_x, middleY)
                 .release()
                 .perform();
-    }
-
-    public String waitForElementAndGetAttribute(By by, String attribute, String error_msg, long timeoutInSeconds)
-    {
-        WebElement element = waitForElementPresent(by, error_msg, timeoutInSeconds);
-        return element.getAttribute(attribute);
     }
 }

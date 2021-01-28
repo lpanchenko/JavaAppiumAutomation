@@ -13,8 +13,8 @@ public class ChangeAppConditionTests extends CoreTestCase
         SearchPageObject SearchPageObject = new SearchPageObject(driver);
 
         SearchPageObject.initSearchInput();
-        SearchPageObject.typeSearchLine("Java");
-        SearchPageObject.clickByArticleContainsDescription("Object-oriented programming language");
+        SearchPageObject.enterDataToSearchInput("Java");
+        SearchPageObject.clickByArticleWithDescription("Object-oriented programming language");
 
         ArticlePageObject ArticlePageObject = new ArticlePageObject(driver);
         String title_before_rotation = ArticlePageObject.getArticleTitle();
@@ -40,9 +40,9 @@ public class ChangeAppConditionTests extends CoreTestCase
         SearchPageObject SearchPageObject = new SearchPageObject(driver);
 
         SearchPageObject.initSearchInput();
-        SearchPageObject.typeSearchLine("Java");
-        SearchPageObject.waitForSearchResultContainsDescription("Object-oriented programming language");
+        SearchPageObject.enterDataToSearchInput("Java");
+        SearchPageObject.waitForArticleContainsDescription("Object-oriented programming language");
         this.backgroundApp(2);
-        SearchPageObject.waitForSearchResultContainsDescription("Object-oriented programming language");
+        SearchPageObject.waitForArticleContainsDescription("Object-oriented programming language");
     }
 }
