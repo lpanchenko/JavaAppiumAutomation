@@ -14,6 +14,7 @@ public class SearchPageObject extends MainPageObject {
         SEARCH_INPUT_DEFAULT_TEXT = "org.wikipedia:id/search_src_text",
 
         SEARCH_RESULT_ARTICLE = "//*[@resource-id='org.wikipedia:id/search_results_list']/*[@resource-id='org.wikipedia:id/page_list_item_container']",
+        SEARCH_RESULT_ARTICLE_TITLE_AND_DESCRIPTION_TPL = "//*[@text='{TITLE}']/following-sibling::*[@text='{DESCRIPTION}']",
         SEARCH_RESULT_ARTICLE_DESCRIPTION_TPL = "//*[@text='{SUBSTRING}'][@resource-id='org.wikipedia:id/page_list_item_description']",
         SEARCH_RESULT_ARTICLE_DESCRIPTION_CONTAINS_TPL = "//*[contains(@text, '{SUBSTRING}')][@resource-id='org.wikipedia:id/page_list_item_description']",
         SEARCH_RESULT_ARTICLE_TITLE_TPL = "//*[@text='{SUBSTRING}'][@resource-id='org.wikipedia:id/page_list_item_title']",
@@ -29,6 +30,12 @@ public class SearchPageObject extends MainPageObject {
     }
 
     /* TEMPLATES METHODS */
+    private static String getArticleWithTitleAndDescriptionXpath(String title, String description)
+    {
+        return SEARCH_RESULT_ARTICLE_TITLE_AND_DESCRIPTION_TPL.replace("{TITLE}", title)
+                .replace("{DESCRIPTION}", description);
+    }
+
     private static String getArticleWithTitleXpath(String substring)
     {
         return SEARCH_RESULT_ARTICLE_TITLE_TPL.replace("{SUBSTRING}", substring);
@@ -178,5 +185,14 @@ public class SearchPageObject extends MainPageObject {
                 return false;
         }
         return true;
+    }
+
+    public WebElement getElementByTitleAndDescription(String title, String description)
+    {
+        String search_result_xpath = getArticleWithTitleAndDescriptionXpath(title, description);
+        return waitForElementPresent(By.xpath(search_result_xpath),
+                "Can not found article with title " + title + " and description " + description,
+                10
+        );
     }
 }

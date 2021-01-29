@@ -94,4 +94,25 @@ public class SearchTests extends CoreTestCase
                 SearchPageObject.eachElementContainsText(inputData)
         );
     }
+
+    @Test
+    public void testCompareArticlesTitleAndDescription() throws InterruptedException {
+        String inputData = "Java";
+
+        SearchPageObject SearchPageObject = new SearchPageObject(driver);
+        SearchPageObject.initSearchInput();
+        SearchPageObject.enterDataToSearchInput(inputData);
+
+        assertNotNull("",
+                SearchPageObject.getElementByTitleAndDescription("Java","Island of Indonesia")
+        );
+
+        assertNotNull("",
+                SearchPageObject.getElementByTitleAndDescription("JavaScript","Programming language")
+        );
+
+        assertNotNull("",
+                SearchPageObject.getElementByTitleAndDescription("Java (programming language)","Object-oriented programming language")
+        );
+    }
 }
